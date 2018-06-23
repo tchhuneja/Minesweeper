@@ -1,20 +1,12 @@
 package com.example.tc.minesweeper;
 
-import android.accessibilityservice.GestureDescription;
-import android.graphics.Color;
-import android.graphics.drawable.Drawable;
-import android.graphics.drawable.DrawableContainer;
-import android.graphics.drawable.GradientDrawable;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Size;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.Toast;
-
 import java.util.ArrayList;
-import java.util.MissingFormatArgumentException;
 import java.util.Random;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
@@ -31,7 +23,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     public static int size = 8;
 
-    public static boolean gameover = false;
+    public static boolean gameover;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,6 +32,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         rootlayout = findViewById(R.id.root);
 
+        gameover=false;
         setgrid();
         setmine();
         neighbours();
@@ -70,7 +63,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.MATCH_PARENT, 1);
                 button.setLayoutParams(layoutParams);
                 button.setTextSize(30);
-                button.setTextColor(Color.parseColor("white"));
                 button.setBackgroundResource(R.drawable.button_border);
 
                 button.setOnClickListener(this);
@@ -87,7 +79,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         if (!gameover) {
             MIneButton button = (MIneButton) view;
             button.reveal();
-            button.revealed=true;
             revealneighbours();
         }
         if (gameover)
@@ -117,6 +108,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         }
                     }
                     grid[i][j].setValue(minecount);
+                    if (minecount==0)
+                        grid[i][j].setNomine();
                 }
             }
         }
@@ -134,28 +127,21 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     public void revealneighbours() {
-        for (int i = 0; i < size; i++)
-        {
-            for (int j = 0; j < size; j++)
-            {
-                if (grid[i][j].revealed)
-                {
+        for (int i = 0; i < size; i++){
+            for (int j = 0; j < size; j++){
+                if (grid[i][j].revealed && grid[i][j].nomine){
                     grid[i][j].revealed=false;
-                    for (int k = 0; k < 8; k++)
-                    {
+                    grid[i][j].setButtonvisited();
+                    for (int k = 0; k < 8; k++) {
                         xbound = i + arrayx[k];
                         ybound = j + arrayy[k];
-                        if (xbound >= 0 && ybound >= 0 && xbound < 8 && ybound < 8)
-                        {
-                                if (grid[xbound][ybound].getvalue() != "X")
-                                {
-                                    grid[xbound][ybound].reveal();
-                                    if (grid[xbound][ybound].getvalue() == "0") {
-                                        grid[xbound][ybound].revealed = true;
-                                        grid[xbound][ybound].revealed = false;
-                                        revealneighbours();
-                                    }
-                                }
+                        if (xbound >= 0 && ybound >= 0 && xbound < 8 && ybound < 8 && !grid[xbound][ybound].buttonvisited) {
+                            grid[xbound][ybound].reveal();
+                            if (grid[xbound][ybound].nomine){
+                                grid[xbound][ybound].revealed = true;
+                                grid[xbound][ybound].setButtonvisited();
+                                revealneighbours();
+                            }
                         }
                     }
                 }

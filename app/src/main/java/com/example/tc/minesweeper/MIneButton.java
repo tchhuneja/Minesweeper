@@ -10,6 +10,8 @@ public class MIneButton extends AppCompatButton {
 
     private String value;
     public boolean revealed=false;
+    public boolean nomine=false;
+    public boolean buttonvisited=false;
 
     public void setx(){this.value="X";}
 
@@ -32,6 +34,13 @@ public class MIneButton extends AppCompatButton {
 
     public void setValue(int count) {
         String a = Integer.toString(count);
-        this.value=a;
+        if (count == 0)
+            this.value=" ";
+        else
+            this.value=a;
     }
+
+    public void setNomine(){this.nomine=true; }
+
+    public void setButtonvisited(){this.buttonvisited=true;}
 }
